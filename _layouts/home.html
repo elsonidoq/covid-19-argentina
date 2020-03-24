@@ -7,7 +7,6 @@ layout: default
     <h1 class="page-heading">{{ page.title }}</h1>
   {%- endif -%}
 
-  {{ content | markdownify }}
 
 
   {% if site.paginate %}
@@ -24,6 +23,15 @@ layout: default
     {% endif %}
   {% endfor %}
 
+  {% for post in rawposts %}
+    {% if post.home == true %}
+	<div class="post-content e-content">
+	    {{ post.content }}
+	</div>
+    {% endif %}
+  {% endfor %}
+
+  {{ content | markdownify }}
 
   {%- if posts.size > 0 -%}
     {%- if page.list_title -%}
