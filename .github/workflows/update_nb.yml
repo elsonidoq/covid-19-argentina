@@ -40,7 +40,7 @@ jobs:
     - name: run notebooks
       if: github.event_name != 'push'
       run: |
-        pip install matplotlib pandas seaborn papermill ipykernel jupyter folium plotly plotnine psutil pymc3 arviz xlrd altair jinja2
+        pip install bs4 unidecode PyPDF2 matplotlib pandas seaborn papermill ipykernel jupyter folium plotly plotnine psutil pymc3 arviz xlrd altair jinja2
         python3 -m ipykernel install --user --name python3
         sudo chmod -R 777 .
         cd _notebooks
