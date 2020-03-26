@@ -125,5 +125,15 @@ def get_arg_df():
             gd['date'] = date
             docs.append(gd)
 
-    return pd.DataFrame(docs).sort_values('date')
+    raw_df = pd.DataFrame(docs).sort_values('date')
+    dfs = []
+
+    for place in raw_df.infered_place.unique():
+        p_df = raw_df[raw_df.infered_place==place].copy()
+        d0 = p_df.date.min()
+        p_df['days_from_first_infection'] = (p_df.date - d0).apply(lambda x: x.days)
+        p_df['cum_infected'] = p_df['infected'].cumsum()
+        dfs.append(p_df)
+        
+    return pd.concat(dfs)
 
