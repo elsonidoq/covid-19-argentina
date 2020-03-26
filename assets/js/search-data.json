@@ -25,7 +25,7 @@
     
         ,"post2": {
             "title": "Home",
-            "content": "Evolucion en el tiempo de la cantidad de casos totales . Haciendo Shift+Click en las provincias que se ven a la derecha, podemos agregar o quitar provincias al gráfico . Nota de color: Los graficos se actualizan solos!!. Una vez por hora se corre el script que busca la data y arma los graficos via una action de github . Esta página es un experimento para evaluar la utilidad de la informacion que se encuentra disponible en el sitio https://www.argentina.gob.ar/coronavirus/informe-diario para tener una vision general de lo que pasa en el pais .",
+            "content": "Evolucion en el tiempo de la cantidad de casos totales . Nota de color: Los graficos se actualizan solos!!. Una vez por hora se corre el script que busca la data y arma los graficos via una action de github . Haciendo Shift+Click en las provincias que se ven a la derecha, podemos agregar o quitar provincias al gráfico . Esta página es un experimento para evaluar la utilidad de la informacion que se encuentra disponible en el sitio https://www.argentina.gob.ar/coronavirus/informe-diario para tener una vision general de lo que pasa en el pais .",
             "url": "https://elsonidoq.github.io/covid-19-argentina/2020/03/24/home.html",
             "relUrl": "/2020/03/24/home.html",
             "date": " • Mar 24, 2020"
