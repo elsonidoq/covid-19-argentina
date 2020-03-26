@@ -1,5 +1,5 @@
 import numpy as np
-
+from unidecode import unidecode
 from io import StringIO
 import csv
 import pandas as pd
@@ -14,11 +14,15 @@ def parse_data(fname):
         
     new_docs = []
     for doc in docs:
+        doc = {unidecode(k): v for k, v in doc.items()}
         meta = {k: doc[k] for k in ['Province/State', 'Country/Region', 'Lat', 'Long']}
         for k, v in doc.items():
             if k in meta: continue
             new_doc = meta.copy()
-            new_doc['date'] = datetime.strptime(k, '%m/%d/%y')
+
+            date_format = '%m/%d/%Y'
+            if len(k) <= 7: date_format = date_format.lower()
+            new_doc['date'] = datetime.strptime(k, date_format)
             if not v: continue
             new_doc['cnt'] = int(v)
             new_docs.append(new_doc)
@@ -39,13 +43,13 @@ def parse_data(fname):
 
 
 def get_global_covid_df():
-    confirmed_df = parse_data('csse_covid_19_time_series/time_series_19-covid-Confirmed.csv')
+    confirmed_df = parse_data('csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
     confirmed_df = confirmed_df.rename(columns=dict(cnt='confirmed'))
 
-    recovered_df = parse_data('csse_covid_19_time_series/time_series_19-covid-Recovered.csv')
+    recovered_df = parse_data('csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
     recovered_df = recovered_df.rename(columns=dict(cnt='recovered'))
 
-    death_df = parse_data('csse_covid_19_time_series/time_series_19-covid-Deaths.csv')
+    death_df = parse_data('csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
     death_df = death_df.rename(columns=dict(cnt='death'))
 
     # merge everything together
