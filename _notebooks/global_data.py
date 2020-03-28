@@ -68,30 +68,57 @@ def get_global_covid_df():
         dfs.append(cdf)
     
     df = pd.concat(dfs).reset_index()
-    
+
     # compute days_from_first_infection and days_from_first_death
     df = df.merge(
         df[df.confirmed > 0]
-        .groupby('country')
-        .date.min()
-        .reset_index()
-        .rename(columns=dict(date='first_infaction_date'))
+          .groupby('country')
+          .date.min()
+          .reset_index()
+          .rename(columns=dict(date='first_infaction_date')),
+        on='country'
     )
-
     df['days_from_first_infection'] = (
         (df['date'] - df['first_infaction_date']).apply(lambda x: x.days)
     )
+
+    df = df.merge(
+        df[df.confirmed > 10]
+          .groupby('country')
+          .date.min()
+          .reset_index()
+          .rename(columns=dict(date='tenth_infaction_date')),
+        on='country', how='left'
+    )
+    df['days_from_tenth_infection'] = (
+        (df['date'] - df['tenth_infaction_date']).apply(lambda x: x.days)
+    )
+
 
     df = df.merge(
         df[df.death > 0]
           .groupby('country')
           .date.min()
           .reset_index()
-          .rename(columns=dict(date='first_death_date'))
+          .rename(columns=dict(date='first_death_date')),
+        on='country', how='left'
     )
 
     df['days_from_first_death'] = (
         (df['date'] - df['first_death_date']).apply(lambda x: x.days)
+    )
+
+    df = df.merge(
+        df[df.death > 10]
+          .groupby('country')
+          .date.min()
+          .reset_index()
+          .rename(columns=dict(date='tenth_death_date')),
+        on='country', how='left'
+    )
+
+    df['days_from_tenth_death'] = (
+        (df['date'] - df['tenth_death_date']).apply(lambda x: x.days)
     )
         
     return df 
