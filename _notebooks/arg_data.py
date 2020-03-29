@@ -106,13 +106,17 @@ def get_arg_df():
     docs = []
 
     for pdf_link in get_pdf_links():
-        cached_fname = fetch_pdf(pdf_link)
-        
+        cached_fname = fetch_pdf(pdf_link) 
+        print(f"Processing {cached_fname}...")
+
         pdfReader = PyPDF2.PdfFileReader(cached_fname.open('rb'))
-        page = pdfReader.getPage(0)
-        txt = page.extractText().replace('personas', '').replace('\n', ' ')
+        pdfReader.getPage(0)
+        txt = '\n\n'.join(
+            page.extractText().replace('personas', '').replace('\n', ' ') for page in pdfReader.flattenedPages
+        )
 
         matches = list(pat.finditer(txt)) + list(pat2.finditer(txt))
+        print(f"\tHas {len(matches)} matches")
 
         date = extract_date(pdf_link)
         if date is None: 
