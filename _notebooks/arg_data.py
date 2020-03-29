@@ -43,7 +43,7 @@ def get_pdf_links():
         if 'whatsapp' in href: continue
         if 'matutino' in href: continue
             
-        if 'diario' in href:
+        if 'pdf' in href:
             pdfs.append(href)
 
     return pdfs
