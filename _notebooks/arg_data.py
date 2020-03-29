@@ -29,7 +29,6 @@ headers = {'authority': 'www.argentina.gob.ar',
  'accept-language': 'en-US,en;q=0.9,es-AR;q=0.8,es;q=0.7'}
 
 
-
 def get_pdf_links():
     content = requests.get('https://www.argentina.gob.ar/coronavirus/informe-diario', headers=headers).content
 
@@ -106,13 +105,17 @@ def get_arg_df():
     docs = []
 
     for pdf_link in get_pdf_links():
-        cached_fname = fetch_pdf(pdf_link)
-        
+        cached_fname = fetch_pdf(pdf_link) 
+        print(f"Processing {cached_fname}...")
+
         pdfReader = PyPDF2.PdfFileReader(cached_fname.open('rb'))
-        page = pdfReader.getPage(0)
-        txt = page.extractText().replace('personas', '').replace('\n', ' ')
+        pdfReader.getPage(0)
+        txt = '\n\n'.join(
+            page.extractText().replace('personas', '').replace('\n', ' ') for page in pdfReader.flattenedPages
+        )
 
         matches = list(pat.finditer(txt)) + list(pat2.finditer(txt))
+        print(f"\tHas {len(matches)} matches")
 
         date = extract_date(pdf_link)
         if date is None: 
