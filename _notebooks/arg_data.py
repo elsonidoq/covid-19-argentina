@@ -61,7 +61,11 @@ def fetch_pdf(link):
 
 def extract_date(link):
     last = link.split('/')[-1]
-    date_string = date_pat.search(last).group(0)
+
+    match = date_pat.search(last)
+    if match is None: return
+    date_string = match.group(0)
+
     day, month, year = map(int, date_string.split('-'))
     if year == 20: year = 2020
     return datetime(year, month, day)
@@ -111,6 +115,10 @@ def get_arg_df():
         matches = list(pat.finditer(txt)) + list(pat2.finditer(txt))
 
         date = extract_date(pdf_link)
+        if date is None: 
+            print(f'Skipping {pdf_link.split("/")[-1]}')
+            continue
+
         for e in matches:
             gd = e.groupdict()
             
