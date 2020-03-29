@@ -12,4 +12,3 @@ En este blog voy a estar posteando visualizaciones que creo utiles para evaluar 
 
 _powered by [fastpages](https://github.com/fastai/fastpages)_
 
-
