@@ -11,4 +11,3 @@ https://elsonidoq.github.io/covid-19-argentina/
 En este blog voy a estar posteando visualizaciones que creo utiles para evaluar la situación local como la global
 
 _powered by [fastpages](https://github.com/fastai/fastpages)_
-
