@@ -1,3 +1,4 @@
+from datetime import timedelta
 import numpy as np
 from unidecode import unidecode
 from io import StringIO
@@ -25,8 +26,20 @@ def parse_data(fname):
             new_doc['date'] = datetime.strptime(k, date_format)
             if not v: continue
             new_doc['cnt'] = int(v)
+            if new_doc['Country/Region'] == 'Argentina' and new_doc['date'] >= datetime(2020, 3, 22):
+                new_doc['date'] += timedelta(days=1)
             new_docs.append(new_doc)
 
+    new_docs.append(
+            # This data is missing from JHU
+            # see https://www.who.int/docs/default-source/coronaviruse/situation-reports/20200323-sitrep-63-covid-19.pdf?sfvrsn=b617302d_4
+            {
+                  'Province/State': 'Buenos Aires',
+                  'Country/Region': 'Argentina',
+                  'cnt': 225,
+                  'date': datetime(2020, 3, 22)
+            }
+    )
 
     return (
         pd.DataFrame(new_docs)
