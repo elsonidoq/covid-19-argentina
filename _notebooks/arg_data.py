@@ -71,7 +71,10 @@ def extract_date(link):
 
 
 def get_vec(s):
-    return Counter(s)
+    res = Counter(s)
+    res.update(f'{prev}_{next}' for prev, next in zip(s[:-1], s[1:]))
+    return res
+
 
 def sim(query_s, target_s):
     query_v = get_vec(query_s.lower())
@@ -80,7 +83,7 @@ def sim(query_s, target_s):
     res = 0
     for char, cnt in query_v.items():
         res += min(cnt, target_v.get(char, 0))
-    return res / max(len(target_s), len(query_s))
+    return res / max(sum(target_v.values()), sum(query_v.values()))
     
 def infer_province(txt):
     if 'buenosaires' in txt.lower().replace(' ', ''):
@@ -97,44 +100,52 @@ def infer_province(txt):
     return p, score
     
 
+def extract_pdf_data(cached_fname):
+    print(f"Processing {cached_fname}...")
+    pat = re.compile(r'[^/|\w](?P<num>\d+)(?P<middle>( *[a-z]{,3}){,2} *)(?P<place>[A-Z]\w+(\s\w+)*)')
+    pat2 = re.compile('\((?P<num>\d+)\)(?P<middle>( *[a-z]{,3}){,5} *)(?P<place>[A-Z]\w+(\s\w+)*)')
+    pat3 = re.compile('-\s+(?P<place>[A-Z]\w+(\s\w+)*)(?P<middle>\s+)(?P<num>\d+)\s+\|\s+(?P<acum>\d+)')
+
+    pdfReader = PyPDF2.PdfFileReader(cached_fname.open('rb'))
+    pdfReader.getPage(0)
+    txt = '\n\n'.join(
+        page.extractText().replace('personas', '').replace('\n', ' ') for page in pdfReader.flattenedPages
+    )
+
+    matches = list(pat.finditer(txt)) + list(pat2.finditer(txt)) + list(pat3.finditer(txt))
+    print(f"\tHas {len(matches)} matches")
+
+    res = []
+    for e in matches:
+        gd = e.groupdict()
+        
+        if 'argentina' in gd['place'].lower(): continue 
+        if 'covid' in gd['place'].lower(): continue
+        if 'informe' in gd['place'].lower(): continue
+        
+        gd['infered_place'], gd['infered_place_score'] = infer_province(gd['place'])
+        
+        gd['infected'] = int(gd.pop('num'))
+        if gd['infected'] == 0: continue
+        res.append(gd)
+    return res
+
 
 def get_arg_df():
-    pat = re.compile('(?P<num>\d+)(?P<middle>( *[a-z]{,3}){,2} *)(?P<place>[A-Z]\w+(\s\w+)*)')
-    pat2 = re.compile('\((?P<num>\d+)\)(?P<middle>( *[a-z]{,3}){,5} *)(?P<place>[A-Z]\w+(\s\w+)*)')
-
     docs = []
 
     for pdf_link in get_pdf_links():
-        cached_fname = fetch_pdf(pdf_link) 
-        print(f"Processing {cached_fname}...")
-
-        pdfReader = PyPDF2.PdfFileReader(cached_fname.open('rb'))
-        pdfReader.getPage(0)
-        txt = '\n\n'.join(
-            page.extractText().replace('personas', '').replace('\n', ' ') for page in pdfReader.flattenedPages
-        )
-
-        matches = list(pat.finditer(txt)) + list(pat2.finditer(txt))
-        print(f"\tHas {len(matches)} matches")
-
         date = extract_date(pdf_link)
         if date is None: 
             print(f'Skipping {pdf_link.split("/")[-1]}')
             continue
 
-        for e in matches:
-            gd = e.groupdict()
-            
-            if 'argentina' in gd['place'].lower(): continue 
-            if 'covid' in gd['place'].lower(): continue
-            if 'informe' in gd['place'].lower(): continue
-            
-            gd['infered_place'], gd['infered_place_score'] = infer_province(gd['place'])
-            
-            gd['infected'] = int(gd.pop('num'))
-            gd.pop('middle')
-            gd['date'] = date
-            docs.append(gd)
+        cached_fname = fetch_pdf(pdf_link) 
+        for doc in extract_pdf_data(cached_fname):
+            doc.pop('middle')
+            doc['date'] = date
+            docs.append(doc)
+
 
     raw_df = pd.DataFrame(docs).sort_values('date')
     dfs = []
