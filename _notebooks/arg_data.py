@@ -126,7 +126,7 @@ def extract_pdf_data(cached_fname):
         gd['infered_place'], gd['infered_place_score'] = infer_province(gd['place'])
         
         gd['infected'] = int(gd.pop('num'))
-        if gd['infected'] == 0: continue
+        if gd['infected'] <= 0: continue
         res.append(gd)
     return res
 
@@ -157,5 +157,7 @@ def get_arg_df():
         p_df['cum_infected'] = p_df['infected'].cumsum()
         dfs.append(p_df)
         
-    return pd.concat(dfs)
+    res = pd.concat(dfs)
+    # This shouldn't be necesary, but it fails as is there were 0s on github
+    return res[res.cum_infected > 0]
 
