@@ -26,8 +26,6 @@ def parse_data(fname):
             new_doc['date'] = datetime.strptime(k, date_format)
             if not v: continue
             new_doc['cnt'] = int(v)
-            if new_doc['Country/Region'] == 'Argentina' and new_doc['date'] >= datetime(2020, 3, 22):
-                new_doc['date'] += timedelta(days=1)
             new_docs.append(new_doc)
 
     new_docs.append(
