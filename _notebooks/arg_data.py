@@ -104,7 +104,7 @@ def extract_pdf_data(cached_fname):
     print(f"Processing {cached_fname}...")
     pat = re.compile(r'[^/|\w](?P<num>\d+)(?P<middle>( *[a-z]{,3}){,2} *)(?P<place>[A-Z]\w+(\s\w+)*)')
     pat2 = re.compile('\((?P<num>\d+)\)(?P<middle>( *[a-z]{,3}){,5} *)(?P<place>[A-Z]\w+(\s\w+)*)')
-    pat3 = re.compile('-\s+(?P<place>[A-Z]\w+(\s\w+)*)(?P<middle>\s+)(?P<num>\d+)\s+\|\s+(?P<acum>\d+)')
+    pat3 = re.compile('-\s+(?P<place>[A-Z]\w+(\s\w+)*)(?P<middle>\s+)(?P<num>\d+)\s+[\|/]\s+(?P<acum>\d+)')
 
     pdfReader = PyPDF2.PdfFileReader(cached_fname.open('rb'))
     pdfReader.getPage(0)
