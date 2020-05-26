@@ -1,3 +1,4 @@
+from urllib.parse import urljoin
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -30,8 +31,19 @@ headers = {'authority': 'www.argentina.gob.ar',
 
 
 def get_pdf_links():
-    content = requests.get('https://www.argentina.gob.ar/coronavirus/informe-diario', headers=headers).content
-
+    url = 'https://www.argentina.gob.ar/coronavirus/informe-diario'
+    content = requests.get(url, headers=headers).content
+    
+    soup = BeautifulSoup(content, 'html.parser')
+    res = []
+    for a in soup.find_all('a'):
+        href = a.attrs.get('href', '')
+        if '/informe-diario/' not in href: continue
+        res.extend(get_month_links(urljoin(url, href)))
+    return res
+    
+def get_month_links(link):
+    content = requests.get(link, headers=headers).content
     soup = BeautifulSoup(content, 'html.parser')
 
     pdfs = []
@@ -46,7 +58,6 @@ def get_pdf_links():
             pdfs.append(href)
 
     return pdfs
-
 
 def fetch_pdf(link):
     cache_path = Path('cache')
@@ -87,7 +98,7 @@ def sim(query_s, target_s):
     
 def infer_province(txt):
     if 'buenosaires' in txt.lower().replace(' ', ''):
-        if 'ciudad' in txt.lower(): return 'Ciudad autonoma de Buenos Aires', 1
+        if 'ciudad' in txt.lower(): return 'Ciudad Autonoma de Buenos Aires', 1
         else: return 'Provincia de Buenos Aires', 1
                       
     scores = {}
