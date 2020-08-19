@@ -50,7 +50,6 @@ jobs:
         papermill --log-output --kernel python3 2020-03-24-home.ipynb 2020-03-24-home.ipynb
         papermill --log-output --kernel python3 2020-03-24-argentina-en-contexto.ipynb 2020-03-24-argentina-en-contexto.ipynb
         papermill --log-output --kernel python3 2020-03-25-hace-tu-post.ipynb 2020-03-25-hace-tu-post.ipynb
-        papermill --log-output --kernel python3 2020-03-30-fit-exponencial.ipynb 2020-03-30-fit-exponencial.ipynb
 
     - name: run notebooks - modeling
       if: github.event_name == 'schedule'
